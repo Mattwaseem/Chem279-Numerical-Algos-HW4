@@ -1,4 +1,3 @@
-// FileInputParser.cpp
 #include "FileInputParser.h"
 #include <fstream>
 #include <sstream>

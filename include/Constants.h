@@ -16,6 +16,7 @@ class Constants
 {
 public:
     Constants();
+    const double hartree_to_eV = 27.211;
 
     double getIonizationPotential(int atomicNumber) const;
     double getElectronAffinity(int atomicNumber) const;

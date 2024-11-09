@@ -5,13 +5,13 @@
 
 Constants::Constants()
 {
-    // Ionization potentials (in eV)
+    // Ionization
     ionizationPotentials = {{1, 7.176}, {6, 14.051}, {7, 19.316}, {8, 25.390}, {9, 32.272}};
 
-    // Electron affinities (in eV)
+    // Electron affinities
     electronAffinities = {{1, 5.572}, {6, 7.275}, {7, 9.111}, {8, 11.080}, {9, 3.401}};
 
-    // Bonding parameters (in eV)
+    // Bonding parameter
     bondingParameters = {{1, 9.0}, {6, 21.0}, {7, 25.0}, {8, 31.0}, {9, 39.0}};
 
     // Valence electrons / Effective nuclear charge

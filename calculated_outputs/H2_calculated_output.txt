@@ -1,8 +1,22 @@
-Fock Matrix fAlpha for /Users/nematsfolder/chem279/homework4/sample_input/H2.txt:
-  -25.4960   75.5644
-   75.5644  -25.4960
+Fock Matrix Fa (Hartree):
+  -1.2250  -0.2180
+  -0.2180  -1.2250
 
-Density Matrix (P total):
-   0.5000  -0.5000
-  -0.5000   0.5000
+Fock Matrix Fb (Hartree):
+  -1.2250  -0.2180
+  -0.2180  -1.2250
 
+Density Matrix P_alpha:
+   0.5000   0.5000
+   0.5000   0.5000
+
+Density Matrix P_beta:
+   0.5000   0.5000
+   0.5000   0.5000
+
+Total Density Matrix P_total:
+   1.0000   1.0000
+   1.0000   1.0000
+
+Electron Energy: -117.796 eV
+Total Energy ECNDO/2: -98.3378 eV

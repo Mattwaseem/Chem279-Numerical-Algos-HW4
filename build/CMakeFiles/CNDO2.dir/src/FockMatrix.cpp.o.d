@@ -1,6 +1,7 @@
 CMakeFiles/CNDO2.dir/src/FockMatrix.cpp.o: \
   /Users/nematsfolder/chem279/homework4/src/FockMatrix.cpp \
   /Users/nematsfolder/chem279/homework4/include/FockMatrix.h \
+  /Users/nematsfolder/chem279/homework4/include/DensityMatrix.h \
   /opt/homebrew/include/armadillo \
   /opt/homebrew/include/armadillo_bits/config.hpp \
   /opt/homebrew/include/armadillo_bits/compiler_check.hpp \
@@ -1446,8 +1447,6 @@ CMakeFiles/CNDO2.dir/src/FockMatrix.cpp.o: \
   /opt/homebrew/include/armadillo_bits/newarp_UpperHessenbergEigen_meat.hpp \
   /opt/homebrew/include/armadillo_bits/newarp_UpperHessenbergQR_meat.hpp \
   /opt/homebrew/include/armadillo_bits/compiler_setup_post.hpp \
-  /Users/nematsfolder/chem279/homework4/include/DensityMatrix.h \
   /Users/nematsfolder/chem279/homework4/include/OverlapMatrix.h \
   /Users/nematsfolder/chem279/homework4/include/CartesianGaussian.h \
-  /Users/nematsfolder/chem279/homework4/include/GammaCalculator.h \
-  /Users/nematsfolder/chem279/homework4/include/Constants.h
+  /Users/nematsfolder/chem279/homework4/include/GammaCalculator.h

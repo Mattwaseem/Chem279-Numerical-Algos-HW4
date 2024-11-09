@@ -3,14 +3,17 @@
 
 #include <cmath>
 #include <vector>
+#include <armadillo>
 
 class GammaCalculator
 {
 public:
-    double calculateGamma(double Ra, double Rb, const std::vector<double> &alphas, const std::vector<double> &d_total);
+    // Calculates Gamma_AB integral between basis functions mu and nu
+    double calculateGamma(size_t mu, size_t nu, const std::vector<double> &alphas, const std::vector<double> &d_total, const arma::vec &position_mu, const arma::vec &position_nu);
 
 private:
-    double Zero_zero(double Ra, double Rb, double sigmaA, double sigmaB);
+    // Helper function to compute the integral based on distance and sigmas
+    double Zero_zero(double distance, double sigmaA, double sigmaB);
 };
 
 #endif // GAMMACALCULATOR_H

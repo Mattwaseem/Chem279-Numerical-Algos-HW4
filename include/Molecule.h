@@ -21,7 +21,6 @@ public:
     const std::vector<Atom> &getAtoms() const;
     int getNumBasisFunctions() const;
 
-    // Add this method
     void addAtom(const Atom &atom);
 
 private:
