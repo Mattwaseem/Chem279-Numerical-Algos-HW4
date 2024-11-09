@@ -68,7 +68,7 @@ include CMakeFiles/run.dir/progress.make
 
 CMakeFiles/run: /Users/nematsfolder/chem279/homework4/bin/CNDO2
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/Users/nematsfolder/chem279/homework4/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Running CNDO2 program"
-	cd /Users/nematsfolder/chem279/homework4 && /Users/nematsfolder/chem279/homework4/bin/CNDO2 /Users/nematsfolder/chem279/homework4/sample_input/H2.txt /Users/nematsfolder/chem279/homework4/sample_input/HF.txt /Users/nematsfolder/chem279/homework4/sample_input/HO.txt
+	cd /Users/nematsfolder/chem279/homework4 && /Users/nematsfolder/chem279/homework4/bin/CNDO2 /Users/nematsfolder/chem279/homework4/sample_input/H2.txt /Users/nematsfolder/chem279/homework4/sample_input/HF.txt /Users/nematsfolder/chem279/homework4/sample_input/HO.txt /Users/nematsfolder/chem279/homework4/sample_input/N2.txt /Users/nematsfolder/chem279/homework4/sample_input/O2.txt
 
 run: CMakeFiles/run
 run: CMakeFiles/run.dir/build.make

@@ -24,17 +24,16 @@ add_executable(CNDO2
     src/Molecule.cpp
     src/FileInputParser.cpp
     src/Constants.cpp
-    src/OverlapMatrix.cpp 
+    src/OverlapMatrix.cpp
     src/CartesianGaussian.cpp
 )
-
 
 # Link Armadillo
 target_link_libraries(CNDO2 ${ARMADILLO_LIBRARIES})
 
 # Run command to execute binary from bin directory
 add_custom_target(run
-    COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CNDO2 ${CMAKE_SOURCE_DIR}/sample_input/H2.txt ${CMAKE_SOURCE_DIR}/sample_input/HF.txt ${CMAKE_SOURCE_DIR}/sample_input/HO.txt
+    COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CNDO2 ${CMAKE_SOURCE_DIR}/sample_input/H2.txt ${CMAKE_SOURCE_DIR}/sample_input/HF.txt ${CMAKE_SOURCE_DIR}/sample_input/HO.txt ${CMAKE_SOURCE_DIR}/sample_input/N2.txt ${CMAKE_SOURCE_DIR}/sample_input/O2.txt
     DEPENDS CNDO2
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Running CNDO2 program"

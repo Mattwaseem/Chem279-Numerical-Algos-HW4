@@ -64,6 +64,16 @@ void processMolecule(const std::string &inputFilename)
         p = 4;
         q = 3;
     }
+    else if (inputFilename.find("N2") != std::string::npos)
+    {
+        p = 5;
+        q = 5;
+    }
+    else if (inputFilename.find("O2") != std::string::npos)
+    {
+        p = 7;
+        q = 5;
+    }
     else
     {
         p = totalValenceElectrons / 2;
@@ -71,7 +81,7 @@ void processMolecule(const std::string &inputFilename)
     }
 
     std::cout << "Processing Molecule: " << inputFilename << "\n";
-    std::cout << "Number of Alpha Electrons (p): " << p << ", Number of Beta Electrons (q): " << q << "\n";
+    std::cout << "p = " << p << " q = " << q << "\n";
 
     molecule.computeBasisFunctions();
     int numBasisFunctions = molecule.getNumBasisFunctions();
@@ -85,16 +95,12 @@ void processMolecule(const std::string &inputFilename)
         exit(1);
     }
 
-    std::cout << "Atomic Numbers per Basis Function:" << std::endl;
-    for (size_t i = 0; i < atomicNumbersPerBasisFunction.size(); ++i)
-    {
-        std::cout << "Basis Function " << i << ": Atomic Number = " << atomicNumbersPerBasisFunction[i] << std::endl;
-    }
-
     OverlapMatrix overlapMatrix(basisFunctions);
     overlapMatrix.computeOverlapMatrix();
 
     std::cout << "Overlap matrix calculated, dimensions: " << overlapMatrix.getMatrix().n_rows << " x " << overlapMatrix.getMatrix().n_cols << std::endl;
+    std::cout << "Overlap Matrix S:\n"
+              << overlapMatrix.getMatrix() << "\n";
 
     arma::mat P_alpha = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
     arma::mat P_beta = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
@@ -108,9 +114,8 @@ void processMolecule(const std::string &inputFilename)
         {
             double ZA = constants.getValenceElectrons(parser.getAtomicNumberFromSymbol(atoms[A].element));
             double ZB = constants.getValenceElectrons(parser.getAtomicNumberFromSymbol(atoms[B].element));
-
-            double distance_bohr = arma::norm(arma::vec({atoms[A].x, atoms[A].y, atoms[A].z}) - arma::vec({atoms[B].x, atoms[B].y, atoms[B].z}));
-            nuclearRepulsionEnergy += (ZA * ZB) / distance_bohr;
+            double distance = arma::norm(arma::vec({atoms[A].x, atoms[A].y, atoms[A].z}) - arma::vec({atoms[B].x, atoms[B].y, atoms[B].z}));
+            nuclearRepulsionEnergy += (ZA * ZB) / distance;
         }
     }
     nuclearRepulsionEnergy *= constants.hartree_to_eV;
@@ -155,37 +160,27 @@ void processMolecule(const std::string &inputFilename)
     }
 
     arma::mat H_core = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
-    if (inputFilename.find("H2") != std::string::npos)
+    for (size_t mu = 0; mu < numBasisFunctions; ++mu)
     {
-        H_core(0, 0) = -1.225;
-        H_core(1, 1) = -1.225;
-        H_core(0, 1) = -0.218;
-        H_core(1, 0) = -0.218;
-    }
-    else
-    {
-        for (size_t mu = 0; mu < numBasisFunctions; ++mu)
+        for (size_t nu = 0; nu < numBasisFunctions; ++nu)
         {
-            for (size_t nu = 0; nu < numBasisFunctions; ++nu)
+            if (mu == nu)
             {
-                if (mu == nu)
-                {
-                    int atomA = atomicNumbersPerBasisFunction[mu];
-                    double I_mu = constants.getIonizationPotential(atomA) * (1.0 / 27.211);
-                    double A_mu = constants.getElectronAffinity(atomA) * (1.0 / 27.211);
-                    double Z_A = constants.getValenceElectrons(atomA);
-                    double gammaAA = alphas[mu];
-                    H_core(mu, nu) = -0.5 * (I_mu + A_mu + gammaAA);
-                }
-                else
-                {
-                    int atomA = atomicNumbersPerBasisFunction[mu];
-                    int atomB = atomicNumbersPerBasisFunction[nu];
-                    double betaA = constants.getBondingParameter(atomA) * (1.0 / 27.211);
-                    double betaB = constants.getBondingParameter(atomB) * (1.0 / 27.211);
-                    double s_mu_nu = overlapMatrix.getMatrix()(mu, nu);
-                    H_core(mu, nu) = -0.5 * (betaA + betaB) * s_mu_nu;
-                }
+                int atomA = atomicNumbersPerBasisFunction[mu];
+                double I_mu = constants.getIonizationPotential(atomA) * (1.0 / 27.211);
+                double A_mu = constants.getElectronAffinity(atomA) * (1.0 / 27.211);
+                double Z_A = constants.getValenceElectrons(atomA);
+                double gammaAA = alphas[mu];
+                H_core(mu, nu) = -0.5 * (I_mu + A_mu + gammaAA);
+            }
+            else
+            {
+                int atomA = atomicNumbersPerBasisFunction[mu];
+                int atomB = atomicNumbersPerBasisFunction[nu];
+                double betaA = constants.getBondingParameter(atomA) * (1.0 / 27.211);
+                double betaB = constants.getBondingParameter(atomB) * (1.0 / 27.211);
+                double s_mu_nu = overlapMatrix.getMatrix()(mu, nu);
+                H_core(mu, nu) = -0.5 * (betaA + betaB) * s_mu_nu;
             }
         }
     }
@@ -196,24 +191,22 @@ void processMolecule(const std::string &inputFilename)
 
     GammaCalculator gammaCalculator(constants);
 
-    if (numBasisFunctions == 2 && inputFilename.find("H2") != std::string::npos)
+    arma::mat gammaMatrix(numBasisFunctions, numBasisFunctions);
+    for (size_t mu = 0; mu < numBasisFunctions; ++mu)
     {
-        std::cout << "gamma\n";
-        for (size_t mu = 0; mu < 2; ++mu)
+        for (size_t nu = 0; nu < numBasisFunctions; ++nu)
         {
-            for (size_t nu = 0; nu < 2; ++nu)
-            {
-                int atomicNumber_mu = atomicNumbersPerBasisFunction[mu];
-                int atomicNumber_nu = atomicNumbersPerBasisFunction[nu];
-                arma::vec position_mu = basisFunctions[mu].getCenter();
-                arma::vec position_nu = basisFunctions[nu].getCenter();
+            int atomicNumber_mu = atomicNumbersPerBasisFunction[mu];
+            int atomicNumber_nu = atomicNumbersPerBasisFunction[nu];
+            arma::vec position_mu = basisFunctions[mu].getCenter();
+            arma::vec position_nu = basisFunctions[nu].getCenter();
 
-                double gammaAB = gammaCalculator.calculateGamma(mu, nu, alphas, d_total, atomicNumber_mu, atomicNumber_nu, position_mu, position_nu);
-                std::cout << (gammaAB * constants.hartree_to_eV) << "   ";
-            }
-            std::cout << "\n";
+            double gammaAB = gammaCalculator.calculateGamma(mu, nu, alphas, d_total, atomicNumber_mu, atomicNumber_nu, position_mu, position_nu);
+            gammaMatrix(mu, nu) = gammaAB * constants.hartree_to_eV;
         }
     }
+    std::cout << "gamma\n"
+              << gammaMatrix << "\n";
 
     FockMatrix fockMatrix(densityMatrix, overlapMatrix, H_core, atomicNumbersPerBasisFunction, alphas, d_total, basisFunctions, constants);
 
@@ -225,6 +218,23 @@ void processMolecule(const std::string &inputFilename)
     arma::mat fAlpha;
     arma::mat fBeta;
 
+    std::ofstream outputFile;
+    std::string outputDirectory = "calculated_outputs";
+    if (!fs::exists(outputDirectory))
+        fs::create_directory(outputDirectory);
+    std::string outputFilename = outputDirectory + "/" + fs::path(inputFilename).stem().string() + "_calculated_output.txt";
+    outputFile.open(outputFilename);
+
+    if (outputFile.is_open())
+    {
+        outputFile << "Overlap Matrix S:\n"
+                   << overlapMatrix.getMatrix() << "\n";
+        outputFile << "gamma Matrix:\n"
+                   << gammaMatrix << "\n";
+        outputFile << "H_core Matrix (eV):\n"
+                   << H_core_eV << "\n";
+    }
+
     while (iteration < maxIterations && !converged)
     {
         std::cout << "Iteration: " << iteration << "\n";
@@ -234,18 +244,14 @@ void processMolecule(const std::string &inputFilename)
 
         arma::mat fAlpha_eV = fAlpha * constants.hartree_to_eV;
         arma::mat fBeta_eV = fBeta * constants.hartree_to_eV;
-        std::cout << "Fa (Hartree):\n"
+        std::cout << "Fa\n"
                   << fAlpha_eV << "\n";
-        std::cout << "Fb (Hartree):\n"
+        std::cout << "Fb\n"
                   << fBeta_eV << "\n";
 
         if (!fAlpha.is_symmetric(1e-12))
         {
             std::cerr << "Warning: fAlpha matrix is not symmetric!\n";
-        }
-        else
-        {
-            std::cout << "fAlpha matrix is symmetric.\n";
         }
 
         arma::vec epsilon_alpha;
@@ -256,8 +262,7 @@ void processMolecule(const std::string &inputFilename)
         arma::mat C_beta;
         arma::eig_sym(epsilon_beta, C_beta, fBeta);
 
-        std::cout << "After solving eigen equation: " << iteration << "\n";
-
+        std::cout << "after solving eigen equation: " << iteration << "\n";
         std::cout << "Ca\n"
                   << C_alpha << "\n";
         std::cout << "Cb\n"
@@ -277,20 +282,25 @@ void processMolecule(const std::string &inputFilename)
         std::cout << "P_t\n"
                   << P_t << "\n";
 
-        arma::mat Ga = fAlpha;
-        arma::mat Gb = fBeta;
-
-        arma::mat Ga_eV = Ga * constants.hartree_to_eV;
-        arma::mat Gb_eV = Gb * constants.hartree_to_eV;
-        std::cout << "Ga (Hartree):\n"
-                  << Ga_eV << "\n";
-        std::cout << "Gb (Hartree):\n"
-                  << Gb_eV << "\n";
+        arma::mat Ga = fAlpha_eV;
+        arma::mat Gb = fBeta_eV;
+        std::cout << "Ga\n"
+                  << Ga << "\n";
+        std::cout << "Gb\n"
+                  << Gb << "\n";
 
         double delta_alpha = arma::max(arma::abs(P_alpha_new - P_alpha)).max();
         double delta_beta = arma::max(arma::abs(P_beta_new - P_beta)).max();
 
-        std::cout << "Delta Alpha: " << delta_alpha << ", Delta Beta: " << delta_beta << "\n";
+        if (iteration == 0)
+        {
+            arma::vec epsilon_alpha_eV = epsilon_alpha * constants.hartree_to_eV;
+            arma::vec epsilon_beta_eV = epsilon_beta * constants.hartree_to_eV;
+            std::cout << "Ea\n"
+                      << epsilon_alpha_eV << "\n";
+            std::cout << "Eb\n"
+                      << epsilon_beta_eV << "\n";
+        }
 
         if (delta_alpha < tolerance && delta_beta < tolerance)
         {
@@ -318,24 +328,17 @@ void processMolecule(const std::string &inputFilename)
 
     std::cout << "Electron Energy is " << electronEnergy_eV << " eV.\n";
     std::cout << "Total Energy ECNDO/2 = " << totalEnergy << " eV.\n";
-
     std::cout << "Nuclear Repulsion Energy is " << nuclearRepulsionEnergy << " eV.\n";
 
-    std::string outputDirectory = "calculated_outputs";
-    if (!fs::exists(outputDirectory))
-        fs::create_directory(outputDirectory);
-    std::string outputFilename = outputDirectory + "/" + fs::path(inputFilename).stem().string() + "_calculated_output.txt";
-
-    std::ofstream outputFile(outputFilename);
     if (outputFile.is_open())
     {
-        outputFile << "Fock Matrix Fa (Hartree):\n"
-                   << fAlpha << "\n";
-        outputFile << "Fock Matrix Fb (Hartree):\n"
-                   << fBeta << "\n";
-        outputFile << "Density Matrix P_alpha:\n"
+        outputFile << "Final Fock Matrix Fa (eV):\n"
+                   << fAlpha * constants.hartree_to_eV << "\n";
+        outputFile << "Final Fock Matrix Fb (eV):\n"
+                   << fBeta * constants.hartree_to_eV << "\n";
+        outputFile << "Final Density Matrix P_alpha:\n"
                    << P_alpha << "\n";
-        outputFile << "Density Matrix P_beta:\n"
+        outputFile << "Final Density Matrix P_beta:\n"
                    << P_beta << "\n";
         outputFile << "Total Density Matrix P_total:\n"
                    << P_total_final << "\n";
