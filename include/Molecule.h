@@ -1,10 +1,10 @@
-#ifndef MOLECULE_HPP
-#define MOLECULE_HPP
+// Molecule.h
+#ifndef MOLECULE_H
+#define MOLECULE_H
 
-#include "CartesianGaussian.h" // Assuming needed for Gaussian functions
+#include "CartesianGaussian.h"
 #include <vector>
 #include <string>
-#include <armadillo>
 
 struct Atom
 {
@@ -15,19 +15,14 @@ struct Atom
 class Molecule
 {
 public:
-    Molecule(); // Constructor
-
-    // Function to compute basis functions and electrons based on the molecule's atoms
+    Molecule();
     void computeBasisFunctions();
+    const std::vector<CartesianGaussian> &getBasisFunctions() const;
+    const std::vector<Atom> &getAtoms() const;
+    int getNumBasisFunctions() const;
 
-    // Getter functions for basis functions, electrons, and atoms
-    const std::vector<CartesianGaussian> &getBasisFunctions() const { return basisFunctions; }
-    int getNumBasisFunctions() const { return numBasisFunctions; }
-    int getNumElectrons() const { return numElectrons; }
-    std::vector<Atom> &getAtoms() { return atoms; }
-
-    // Function to add an atom (used by FileInputParser)
-    void addAtom(const Atom &atom) { atoms.push_back(atom); }
+    // Add this method
+    void addAtom(const Atom &atom);
 
 private:
     std::vector<Atom> atoms;
@@ -36,4 +31,4 @@ private:
     int numElectrons;
 };
 
-#endif
+#endif // MOLECULE_H

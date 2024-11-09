@@ -8,14 +8,14 @@
 struct AtomicParams
 {
     double I_s;  // Ionization energy (s-orbital)
-    double I_p;  // Ionization energy (p-orbital)
-    double beta; // Bonding parameter
+    double I_p;  // Ionization
+    double beta; // Bonding
 };
 
 class Constants
 {
 public:
-    Constants(); // Constructor to initialize the constants
+    Constants();
 
     double getIonizationPotential(int atomicNumber) const;
     double getElectronAffinity(int atomicNumber) const;
@@ -29,4 +29,4 @@ private:
     std::unordered_map<int, double> valenceElectrons;
 };
 
-#endif // CONSTANTS_H
+#endif

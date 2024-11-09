@@ -1,0 +1,8 @@
+Fock Matrix fAlpha for /Users/nematsfolder/chem279/homework4/sample_input/H2.txt:
+  -25.4960   75.5644
+   75.5644  -25.4960
+
+Density Matrix (P total):
+   0.5000  -0.5000
+  -0.5000   0.5000
+

@@ -5,21 +5,17 @@
 
 Constants::Constants()
 {
-    // Populates ionization potentials (in eV)
-    ionizationPotentials = {
-        {1, 7.176}, {6, 14.051}, {7, 19.316}, {8, 25.390}, {9, 32.272}};
+    // Ionization potentials (in eV)
+    ionizationPotentials = {{1, 7.176}, {6, 14.051}, {7, 19.316}, {8, 25.390}, {9, 32.272}};
 
-    // Populates electron affinities (in eV)
-    electronAffinities = {
-        {1, 5.572}, {6, 7.275}, {7, 9.111}, {8, 11.080}, {9, 3.401}};
+    // Electron affinities (in eV)
+    electronAffinities = {{1, 5.572}, {6, 7.275}, {7, 9.111}, {8, 11.080}, {9, 3.401}};
 
-    // Populates bonding parameters (in eV)
-    bondingParameters = {
-        {1, 9.0}, {6, 21.0}, {7, 25.0}, {8, 31.0}, {9, 39.0}};
+    // Bonding parameters (in eV)
+    bondingParameters = {{1, 9.0}, {6, 21.0}, {7, 25.0}, {8, 31.0}, {9, 39.0}};
 
-    // Populates valence electron counts
-    valenceElectrons = {
-        {1, 1}, {6, 4}, {7, 5}, {8, 6}, {9, 7}};
+    // Valence electrons / Effective nuclear charge
+    valenceElectrons = {{1, 1}, {6, 4}, {7, 5}, {8, 6}, {9, 7}}; // Set F to 7 for effective charge
 }
 
 double Constants::getIonizationPotential(int atomicNumber) const

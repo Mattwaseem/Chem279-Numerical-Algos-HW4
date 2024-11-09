@@ -1,13 +1,14 @@
+// FockMatrix.cpp
 #include "FockMatrix.h"
 #include "GammaCalculator.h"
 #include "Constants.h"
-#include "OverlapMatrix.h"
+#include <iostream>
 
 FockMatrix::FockMatrix(const DensityMatrix &densityMatrix, const OverlapMatrix &overlapMatrix,
-                       const std::vector<int> &atomicNumbers, const std::vector<double> &alphas,
+                       const std::vector<int> &atomicNumbersPerBasisFunction, const std::vector<double> &alphas,
                        const std::vector<double> &d_total)
     : densityMatrix(densityMatrix), overlapMatrix(overlapMatrix.getMatrix()),
-      atomicNumbers(atomicNumbers), alphas(alphas), d_total(d_total)
+      atomicNumbersPerBasisFunction(atomicNumbersPerBasisFunction), alphas(alphas), d_total(d_total)
 {
     fockMatrix = arma::mat(densityMatrix.computeTotalDensityMatrix().n_rows,
                            densityMatrix.computeTotalDensityMatrix().n_cols, arma::fill::zeros);
@@ -15,12 +16,24 @@ FockMatrix::FockMatrix(const DensityMatrix &densityMatrix, const OverlapMatrix &
 
 arma::mat FockMatrix::computeDiagonalElements()
 {
+    std::cout << "FockMatrix computeDiagonalElements: fockMatrix size: " << fockMatrix.n_rows << " x " << fockMatrix.n_cols << std::endl;
+    std::cout << "Density matrix size: " << densityMatrix.computeTotalDensityMatrix().n_rows << " x " << densityMatrix.computeTotalDensityMatrix().n_cols << std::endl;
+    std::cout << "Overlap matrix size: " << overlapMatrix.n_rows << " x " << overlapMatrix.n_cols << std::endl;
+
     Constants constants;
     GammaCalculator gammaCalculator;
 
     for (int mu = 0; mu < fockMatrix.n_rows; ++mu)
     {
-        int atomicNumber_mu = atomicNumbers[mu];
+        int atomicNumber_mu;
+        if (mu < atomicNumbersPerBasisFunction.size())
+            atomicNumber_mu = atomicNumbersPerBasisFunction[mu];
+        else
+        {
+            std::cerr << "Error: atomicNumber_mu index out of range for mu = " << mu << std::endl;
+            throw std::out_of_range("atomicNumbersPerBasisFunction index out of range");
+        }
+
         double I_mu = constants.getIonizationPotential(atomicNumber_mu);
         double A_mu = constants.getElectronAffinity(atomicNumber_mu);
         double Z_A = constants.getValenceElectrons(atomicNumber_mu);
@@ -34,7 +47,13 @@ arma::mat FockMatrix::computeDiagonalElements()
         {
             if (B != mu)
             {
-                int atomicNumber_B = atomicNumbers[B];
+                if (B >= atomicNumbersPerBasisFunction.size())
+                {
+                    std::cerr << "Error: atomicNumber_B index out of range for B = " << B << std::endl;
+                    throw std::out_of_range("atomicNumbersPerBasisFunction index out of range");
+                }
+
+                int atomicNumber_B = atomicNumbersPerBasisFunction[B];
                 double Z_B = constants.getValenceElectrons(atomicNumber_B);
                 double gamma_AB = gammaCalculator.calculateGamma(mu, B, alphas, d_total);
                 double P_BB = densityMatrix.computeTotalDensityMatrix()(B, B);
@@ -49,15 +68,31 @@ arma::mat FockMatrix::computeDiagonalElements()
 
 arma::mat FockMatrix::computeOffDiagonalElements()
 {
+    std::cout << "FockMatrix computeOffDiagonalElements: fockMatrix size: " << fockMatrix.n_rows << " x " << fockMatrix.n_cols << std::endl;
+    std::cout << "Density matrix size: " << densityMatrix.computeTotalDensityMatrix().n_rows << " x " << densityMatrix.computeTotalDensityMatrix().n_cols << std::endl;
+    std::cout << "Overlap matrix size: " << overlapMatrix.n_rows << " x " << overlapMatrix.n_cols << std::endl;
+
     Constants constants;
     GammaCalculator gammaCalculator;
 
     for (int mu = 0; mu < fockMatrix.n_rows; ++mu)
     {
-        int atomicNumber_mu = atomicNumbers[mu];
+        if (mu >= atomicNumbersPerBasisFunction.size())
+        {
+            std::cerr << "Error: atomicNumber_mu index out of range for mu = " << mu << std::endl;
+            throw std::out_of_range("atomicNumbersPerBasisFunction index out of range");
+        }
+        int atomicNumber_mu = atomicNumbersPerBasisFunction[mu];
+
         for (int nu = 0; nu < mu; ++nu)
         {
-            int atomicNumber_nu = atomicNumbers[nu];
+            if (nu >= atomicNumbersPerBasisFunction.size())
+            {
+                std::cerr << "Error: atomicNumber_nu index out of range for nu = " << nu << std::endl;
+                throw std::out_of_range("atomicNumbersPerBasisFunction index out of range");
+            }
+            int atomicNumber_nu = atomicNumbersPerBasisFunction[nu];
+
             double beta_A = constants.getBondingParameter(atomicNumber_mu);
             double beta_B = constants.getBondingParameter(atomicNumber_nu);
             double s_mu_nu = overlapMatrix(mu, nu);
@@ -66,7 +101,7 @@ arma::mat FockMatrix::computeOffDiagonalElements()
             double gamma_AB = gammaCalculator.calculateGamma(mu, nu, alphas, d_total);
 
             fockMatrix(mu, nu) = 0.5 * (beta_A + beta_B) * s_mu_nu - P_alpha_mu_nu * gamma_AB;
-            fockMatrix(nu, mu) = fockMatrix(mu, nu);
+            fockMatrix(nu, mu) = fockMatrix(mu, nu); // Ensure symmetry
         }
     }
     return fockMatrix;

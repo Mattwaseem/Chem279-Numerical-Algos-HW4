@@ -1,6 +1,4 @@
 #include "Molecule.h"
-#include "CartesianGaussian.h" // Assuming needed for Gaussian functions
-#include <vector>
 
 Molecule::Molecule() : numBasisFunctions(0), numElectrons(0) {}
 
@@ -14,35 +12,60 @@ void Molecule::computeBasisFunctions()
         arma::vec center = {atom.x, atom.y, atom.z};
         arma::ivec angularMomentumS = {0, 0, 0};
 
-        // Use pre-calculated basis set information instead of defining exponents and coefficients here
         std::vector<double> exponents;
         std::vector<double> coefficients;
 
-        // Determine the basis set for each element
         if (atom.element == "H")
         {
             exponents = {3.42525091, 0.62391373, 0.16885540};
             coefficients = {0.15432897, 0.53532814, 0.44463454};
             numElectrons += 1;
+
+            // Create s-orbital CartesianGaussian for the atom
+            CartesianGaussian s_orbital(center, exponents, angularMomentumS, coefficients);
+            basisFunctions.push_back(s_orbital);
         }
-        else if (atom.element == "C")
+        else if (atom.element == "C" || atom.element == "N" || atom.element == "O" || atom.element == "F")
         {
             exponents = {71.6168370, 13.0450963, 3.5305122};
             coefficients = {0.15432897, 0.53532814, 0.44463454};
-            numElectrons += 4;
+            numElectrons += 4; // Adjust based on element
 
-            // Add p orbitals for carbon
-            std::vector<arma::ivec> angularMomentumP = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-            for (const auto &angularMomentum : angularMomentumP)
+            // Add s-orbital
+            CartesianGaussian s_orbital(center, exponents, angularMomentumS, coefficients);
+            basisFunctions.push_back(s_orbital);
+
+            // Add p-orbitals
+            std::vector<arma::ivec> angularMomentumP = {arma::ivec{1, 0, 0}, arma::ivec{0, 1, 0}, arma::ivec{0, 0, 1}};
+            for (const auto &angMom : angularMomentumP)
             {
-                basisFunctions.emplace_back(center, exponents, angularMomentum, coefficients);
+                CartesianGaussian p_orbital(center, exponents, angMom, coefficients);
+                basisFunctions.push_back(p_orbital);
             }
         }
-
-        // Create s-orbital CartesianGaussian for the atom
-        CartesianGaussian s_orbital(center, exponents, angularMomentumS, coefficients);
-        basisFunctions.push_back(s_orbital);
+        // Add more elements as needed
     }
 
     numBasisFunctions = basisFunctions.size();
+}
+
+const std::vector<CartesianGaussian> &Molecule::getBasisFunctions() const
+{
+    return basisFunctions;
+}
+
+const std::vector<Atom> &Molecule::getAtoms() const
+{
+    return atoms;
+}
+
+int Molecule::getNumBasisFunctions() const
+{
+    return numBasisFunctions;
+}
+
+// Implement the addAtom method
+void Molecule::addAtom(const Atom &atom)
+{
+    atoms.emplace_back(atom);
 }

@@ -1,3 +1,4 @@
+// FileInputParser.cpp
 #include "FileInputParser.h"
 #include <fstream>
 #include <sstream>
@@ -44,7 +45,9 @@ Molecule FileInputParser::parseMolecule(const std::string &filename)
 
                 if (atomicNumberToSymbol.find(atomicNumber) != atomicNumberToSymbol.end())
                 {
-                    molecule.getAtoms().emplace_back(Atom{atomicNumberToSymbol[atomicNumber], x, y, z});
+                    // Use the addAtom method instead of emplace_back
+                    Atom atom = {atomicNumberToSymbol[atomicNumber], x, y, z};
+                    molecule.addAtom(atom);
                 }
                 else
                 {
