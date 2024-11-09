@@ -1,62 +1,4 @@
 <!DOCTYPE html>
-
-# Implementation of CNDO/2 Method for Molecular Calculations
-## Numerical Algorithms Applied to Computational Quantum Chemistry
-### Homework 4: Implementation of Complete Neglect of Differential Overlap (CNDO/2) Method for Molecular Calculations
-#### GitHub Repository: Chem279-Numerical-Algos-HW4
-
-##### Directory Structure
-.
-├── CMakeLists.txt
-├── GammaPseudoCode.cpp
-├── README.md
-├── STO3G_info
-│   ├── C_STO3G.txt
-│   ├── F_STO3G.txt
-│   ├── H_STO3G.txt
-│   ├── N_STO3G.txt
-│   └── O_STO3G.txt
-├── bin
-│   └── CNDO2
-├── build
-├── calculated_outputs
-│   ├── H2_calculated_output.txt
-│   ├── HF_calculated_output.txt
-│   ├── HO_calculated_output.txt
-│   ├── N2_calculated_output.txt
-│   └── O2_calculated_output.txt
-├── homework4.pdf
-├── include
-│   ├── CartesianGaussian.h
-│   ├── Constants.h
-│   ├── DensityMatrix.h
-│   ├── FileInputParser.h
-│   ├── FockMatrix.h
-│   ├── GammaCalculator.h
-│   ├── Molecule.h
-│   ├── OverlapMatrix.h
-│   └── STO3GBasis.h
-├── sample_input
-│   ├── H2.txt
-│   ├── HF.txt
-│   ├── HO.txt
-│   ├── N2.txt
-│   └── O2.txt
-├── sample_output
-│   ├── H2.txt
-│   ├── HF.txt
-│   └── HO.txt
-└── src
-    ├── CartesianGaussian.cpp
-    ├── Constants.cpp
-    ├── DensityMatrix.cpp
-    ├── FileInputParser.cpp
-    ├── FockMatrix.cpp
-    ├── GammaCalculator.cpp
-    ├── Molecule.cpp
-    ├── OverlapMatrix.cpp
-    ├── STO3GBasis.cpp
-    └── main.cpp
 #### Problem 1: Building the CNDO/2 Fock Matrix for Simple Molecules
 #### Problem 2: Evaluating the Open-Shell CNDO/2 Self-Consistent Field Equations
 
@@ -76,7 +18,7 @@
     <li><strong>Calculating the total energy</strong></li>
 </ol>
 
-<p>The assignment was organized into two main problems with a supplementary section:</p>
+<p>The assignment was organized into two main problems with a supplementary section bonus section :) :</p>
 
 <ul>
     <li><strong>Problem 1:</strong> Correctly Building the CNDO/2 Fock Matrix</li>
@@ -90,7 +32,7 @@
 
 <h3>Dependencies:</h3>
 
-<p>Ensure you have the <strong>Armadillo</strong> library installed on your system.</p>
+<p>Make sure you have the <strong>Armadillo</strong> library installed on your system.</p>
 
 <h3>Preparation:</h3>
 
@@ -245,9 +187,9 @@ cd build</code></pre>
 \[ \gamma_{AB} = \frac{14.397}{R_{AB} + \frac{1}{2} \left( \frac{1}{U_A} + \frac{1}{U_B} \right)} \]
 </p>
 
-<p>Finally, unit conversions were performed to obtain all energies in electron volts (eV) from atomic units. The Fock matrix was built, and the calculated outputs were written to corresponding output files with names similar to the input files (e.g., <code>H2.txt</code> → <code>H2_calculated_output.txt</code>).</p>
+<p>Finally, unit conversions were performed to calc. all energies in electron volts (eV) from atomic units. The Fock matrix was built, and the calculated outputs were written to corresponding output files with names similar to the input files (e.g., <code>H2.txt</code> → <code>H2_calculated_output.txt</code>).</p>
 
-<p>Overall, this process established the foundational steps in performing semi-empirical Hartree-Fock calculations, bridging the molecular input data with the SCF process to calculate the total energies of the system.</p>
+<p>Overall, this process built the foundational steps fo`r a semi-empirical Hartree-Fock calculations, bridging the molecular input data with the SCF process to calculate the total energies of the system.</p>
 
 <hr>
 
@@ -282,7 +224,7 @@ cd build</code></pre>
     </li>
     <li><strong>Solving the Eigenvalue Problems:</strong>
         <ul>
-            <li>The eigenvalue problems were solved to obtain the molecular orbital coefficients and eigenvalues using the equations above.</li>
+            <li>The eigenvalue problems were solved to calculate the molecular orbital coefficients and eigenvalues using the equations above.</li>
             <li>The Armadillo library was used for efficient matrix operations.</li>
         </ul>
     </li>
@@ -318,13 +260,13 @@ cd build</code></pre>
 
 <h3>Results:</h3>
 
-<p>The implementation of the open-shell CNDO/2 was successful. The SCF algorithm converged, and the total energies were calculated. The eigenvalues and molecular orbital coefficients were obtained after convergence. While the output total energies did not exactly match the expected energies from sample output files, the overall implementation was successful, and the total energy calculations can be further improved with refinements to the code.</p>
+<p>The implementation of the open-shell CNDO/2 was successful. The SCF algorithm converged, and the total energies were calculated. The eigenvalues and molecular orbital coefficients were obtained after convergence. While the output total energies did not exactly match the expected energies from sample output files, the overall implementation was successful, and the total energy calculations could have been improved if I had more time.</p>
 
 <hr>
 
 <h2>Problem 3: Going Further – Building CNDO/2 for N₂ and O₂</h2>
 
-<p>The extension of the CNDO/2 code to N₂ and O₂ molecules provided valuable insights into the chemical properties and validated the code's capability to handle different electron configurations. Although the total energies did not match experimental results precisely, the ability to build the CNDO/2 method for other systems shows the flexibility of the current implementation. The simulations showed key characteristics such as bond strength, bond order, electronic structure, and magnetic properties.</p>
+<p>The extension of the CNDO/2 code to N₂ and O₂ molecules provides insights into the chemical properties and validated the code's capability to handle different electron configurations. Although the total energies did not match experimental results, the ability to build the CNDO/2 method for other systems shows the flexibility of the current implementation.</p>
 
 <h3>N₂ Simulation:</h3>
 
@@ -342,19 +284,19 @@ cd build</code></pre>
 <ul>
     <li><strong>Results:</strong>
         <ul>
-            <li>Open-shell configuration and paramagnetism were correctly modeled.</li>
+            <li>Open-shell configuration modeled.</li>
             <li>The simulation demonstrated the code's ability to handle unpaired electrons.</li>
         </ul>
     </li>
 </ul>
 
-<p><strong>Overall, the CNDO/2 code proved to be a useful tool for exploring molecular properties and behaviors, providing a solid foundation for further computational chemistry studies.</strong></p>
+<p><strong>Overall, the CNDO/2 code proved to be a useful for exploring molecular properties and behaviors.</strong></p>
 
 <hr>
 
 <h2>Conclusion</h2>
 
-<p>This project successfully implemented the CNDO/2 method for calculating molecular energies and properties. By building the Fock matrices, solving the SCF equations, and calculating total energies, the code can handle both simple molecules and more complex systems like N₂ and O₂. While there is room for improvement in matching experimental energies, the current implementation demonstrates the potential of semi-empirical methods in computational quantum chemistry.</p>
+<p>This project successfully implemented the CNDO/2 method for calculating molecular energies and properties. By building the Fock matrices, solving the SCF equations, and calculating total energies, the code can handle both simple molecules and more complex systems like N₂ and O₂. While there is room for improvement in matching experimental energies, the current implementation shows the potential of semi-empirical methods in computational quantum chemistry.</p>
 
 <hr>
 
