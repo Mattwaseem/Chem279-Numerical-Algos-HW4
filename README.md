@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+# Implementation of CNDO/2 Method for Molecular Calculations
+## Numerical Algorithms Applied to Computational Quantum Chemistry
+### Homework 4: Implementation of Complete Neglect of Differential Overlap (CNDO/2) Method for Molecular Calculations
+** ----------------------------------------------------------------**
 #### Problem 1: Building the CNDO/2 Fock Matrix for Simple Molecules
 #### Problem 2: Evaluating the Open-Shell CNDO/2 Self-Consistent Field Equations
-
-
-
 
 <h2>Assignment Overview</h2>
 
