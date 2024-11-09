@@ -1,4 +1,3 @@
-// main.cpp
 #include "DensityMatrix.h"
 #include "FockMatrix.h"
 #include "GammaCalculator.h"
@@ -15,7 +14,6 @@
 
 namespace fs = std::filesystem;
 
-// Function to process a single molecule and perform SCF
 void processMolecule(const std::string &inputFilename)
 {
     FileInputParser parser;
@@ -37,21 +35,19 @@ void processMolecule(const std::string &inputFilename)
         }
         totalValenceElectrons += constants.getValenceElectrons(atomicNumber);
 
-        // Determine the number of basis functions for each atom
         if (atom.element == "H")
         {
-            atomicNumbersPerBasisFunction.push_back(atomicNumber); // 1 basis function (1s)
+            atomicNumbersPerBasisFunction.push_back(atomicNumber);
         }
         else if (atom.element == "C" || atom.element == "N" || atom.element == "O" || atom.element == "F")
         {
-            atomicNumbersPerBasisFunction.push_back(atomicNumber); // 1 basis function (s)
-            atomicNumbersPerBasisFunction.push_back(atomicNumber); // 1 basis function (p_x)
-            atomicNumbersPerBasisFunction.push_back(atomicNumber); // 1 basis function (p_y)
-            atomicNumbersPerBasisFunction.push_back(atomicNumber); // 1 basis function (p_z)
+            atomicNumbersPerBasisFunction.push_back(atomicNumber);
+            atomicNumbersPerBasisFunction.push_back(atomicNumber);
+            atomicNumbersPerBasisFunction.push_back(atomicNumber);
+            atomicNumbersPerBasisFunction.push_back(atomicNumber);
         }
     }
 
-    // Define number of alpha (p) and beta (q) electrons
     size_t p, q;
     if (inputFilename.find("H2") != std::string::npos)
     {
@@ -77,14 +73,11 @@ void processMolecule(const std::string &inputFilename)
     std::cout << "Processing Molecule: " << inputFilename << "\n";
     std::cout << "Number of Alpha Electrons (p): " << p << ", Number of Beta Electrons (q): " << q << "\n";
 
-    // Compute basis functions using Molecule class
     molecule.computeBasisFunctions();
     int numBasisFunctions = molecule.getNumBasisFunctions();
 
-    // Retrieve basis functions from Molecule
     const std::vector<CartesianGaussian> &basisFunctions = molecule.getBasisFunctions();
 
-    // Validate the size of atomicNumbersPerBasisFunction
     if (atomicNumbersPerBasisFunction.size() != numBasisFunctions)
     {
         std::cerr << "Error: Number of atomicNumbersPerBasisFunction (" << atomicNumbersPerBasisFunction.size()
@@ -92,26 +85,22 @@ void processMolecule(const std::string &inputFilename)
         exit(1);
     }
 
-    // Debugging: Print atomicNumbersPerBasisFunction
     std::cout << "Atomic Numbers per Basis Function:" << std::endl;
     for (size_t i = 0; i < atomicNumbersPerBasisFunction.size(); ++i)
     {
         std::cout << "Basis Function " << i << ": Atomic Number = " << atomicNumbersPerBasisFunction[i] << std::endl;
     }
 
-    // Compute Overlap Matrix
     OverlapMatrix overlapMatrix(basisFunctions);
     overlapMatrix.computeOverlapMatrix();
 
     std::cout << "Overlap matrix calculated, dimensions: " << overlapMatrix.getMatrix().n_rows << " x " << overlapMatrix.getMatrix().n_cols << std::endl;
 
-    // Initialize Density Matrices with initial guess (all zeros)
     arma::mat P_alpha = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
     arma::mat P_beta = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
 
     DensityMatrix densityMatrix(P_alpha, P_beta, p, q);
 
-    // Calculate Nuclear Repulsion Energy
     double nuclearRepulsionEnergy = 0.0;
     for (size_t A = 0; A < atoms.size(); ++A)
     {
@@ -119,24 +108,21 @@ void processMolecule(const std::string &inputFilename)
         {
             double ZA = constants.getValenceElectrons(parser.getAtomicNumberFromSymbol(atoms[A].element));
             double ZB = constants.getValenceElectrons(parser.getAtomicNumberFromSymbol(atoms[B].element));
-            double distance = arma::norm(arma::vec({atoms[A].x, atoms[A].y, atoms[A].z}) - arma::vec({atoms[B].x, atoms[B].y, atoms[B].z}));
-            nuclearRepulsionEnergy += (ZA * ZB) / distance;
+
+            double distance_bohr = arma::norm(arma::vec({atoms[A].x, atoms[A].y, atoms[A].z}) - arma::vec({atoms[B].x, atoms[B].y, atoms[B].z}));
+            nuclearRepulsionEnergy += (ZA * ZB) / distance_bohr;
         }
     }
-    nuclearRepulsionEnergy *= constants.hartree_to_eV; // Convert to eV/a.u.
+    nuclearRepulsionEnergy *= constants.hartree_to_eV;
 
-    std::cout << "Nuclear Repulsion Energy: " << nuclearRepulsionEnergy << " eV\n";
-
-    // Initialize alphas and d_total vectors
     std::vector<double> alphas;
     std::vector<double> d_total;
 
-    // Extract alphas from basisFunctions
     for (const auto &basis : basisFunctions)
     {
         if (!basis.getExponents().empty())
         {
-            alphas.push_back(basis.getExponents()[0]); // Using the first exponent as an example
+            alphas.push_back(basis.getExponents()[0]);
         }
         else
         {
@@ -168,19 +154,16 @@ void processMolecule(const std::string &inputFilename)
         d_total.push_back(d);
     }
 
-    // Compute H_core matrix in Hartree
     arma::mat H_core = arma::zeros<arma::mat>(numBasisFunctions, numBasisFunctions);
     if (inputFilename.find("H2") != std::string::npos)
     {
-        // For H2, set H_core directly as per expected output (in Hartree)
-        H_core(0, 0) = -1.225; // -33.2254 eV
+        H_core(0, 0) = -1.225;
         H_core(1, 1) = -1.225;
-        H_core(0, 1) = -0.218; // -5.9388 eV
+        H_core(0, 1) = -0.218;
         H_core(1, 0) = -0.218;
     }
     else
     {
-
         for (size_t mu = 0; mu < numBasisFunctions; ++mu)
         {
             for (size_t nu = 0; nu < numBasisFunctions; ++nu)
@@ -188,18 +171,18 @@ void processMolecule(const std::string &inputFilename)
                 if (mu == nu)
                 {
                     int atomA = atomicNumbersPerBasisFunction[mu];
-                    double I_mu = constants.getIonizationPotential(atomA); // In Hartree
-                    double A_mu = constants.getElectronAffinity(atomA);    // In Hartree
+                    double I_mu = constants.getIonizationPotential(atomA) * (1.0 / 27.211);
+                    double A_mu = constants.getElectronAffinity(atomA) * (1.0 / 27.211);
                     double Z_A = constants.getValenceElectrons(atomA);
-                    double gammaAA = alphas[mu]; // Ensure this is correctly set
+                    double gammaAA = alphas[mu];
                     H_core(mu, nu) = -0.5 * (I_mu + A_mu + gammaAA);
                 }
                 else
                 {
                     int atomA = atomicNumbersPerBasisFunction[mu];
                     int atomB = atomicNumbersPerBasisFunction[nu];
-                    double betaA = constants.getBondingParameter(atomA); // In Hartree
-                    double betaB = constants.getBondingParameter(atomB); // In Hartree
+                    double betaA = constants.getBondingParameter(atomA) * (1.0 / 27.211);
+                    double betaB = constants.getBondingParameter(atomB) * (1.0 / 27.211);
                     double s_mu_nu = overlapMatrix.getMatrix()(mu, nu);
                     H_core(mu, nu) = -0.5 * (betaA + betaB) * s_mu_nu;
                 }
@@ -207,15 +190,12 @@ void processMolecule(const std::string &inputFilename)
         }
     }
 
-    // Convert H_core to eV for printing
     arma::mat H_core_eV = H_core * constants.hartree_to_eV;
     std::cout << "H_core\n"
               << H_core_eV << "\n";
 
-    // Initialize GammaCalculator
-    GammaCalculator gammaCalculator;
+    GammaCalculator gammaCalculator(constants);
 
-    // Print Gamma Matrix for Debugging (Only for H2)
     if (numBasisFunctions == 2 && inputFilename.find("H2") != std::string::npos)
     {
         std::cout << "gamma\n";
@@ -223,22 +203,20 @@ void processMolecule(const std::string &inputFilename)
         {
             for (size_t nu = 0; nu < 2; ++nu)
             {
-                // Retrieve positions of basis functions mu and nu
+                int atomicNumber_mu = atomicNumbersPerBasisFunction[mu];
+                int atomicNumber_nu = atomicNumbersPerBasisFunction[nu];
                 arma::vec position_mu = basisFunctions[mu].getCenter();
                 arma::vec position_nu = basisFunctions[nu].getCenter();
 
-                // Calculate Gamma_AB
-                double gammaAB = gammaCalculator.calculateGamma(mu, nu, alphas, d_total, position_mu, position_nu);
+                double gammaAB = gammaCalculator.calculateGamma(mu, nu, alphas, d_total, atomicNumber_mu, atomicNumber_nu, position_mu, position_nu);
                 std::cout << (gammaAB * constants.hartree_to_eV) << "   ";
             }
             std::cout << "\n";
         }
     }
 
-    // Initialize FockMatrix object with H_core
-    FockMatrix fockMatrix(densityMatrix, overlapMatrix, H_core, atomicNumbersPerBasisFunction, alphas, d_total, basisFunctions); // Added basisFunctions
+    FockMatrix fockMatrix(densityMatrix, overlapMatrix, H_core, atomicNumbersPerBasisFunction, alphas, d_total, basisFunctions, constants);
 
-    // SCF Parameters
     double tolerance = 1e-6;
     size_t maxIterations = 100;
     bool converged = false;
@@ -247,16 +225,13 @@ void processMolecule(const std::string &inputFilename)
     arma::mat fAlpha;
     arma::mat fBeta;
 
-    // Begin SCF Loop
     while (iteration < maxIterations && !converged)
     {
         std::cout << "Iteration: " << iteration << "\n";
 
-        // Compute Fock Matrices
         fAlpha = fockMatrix.computeFAlpha();
         fBeta = fockMatrix.computeFBeta();
 
-        // Convert Fock matrices to eV for printing
         arma::mat fAlpha_eV = fAlpha * constants.hartree_to_eV;
         arma::mat fBeta_eV = fBeta * constants.hartree_to_eV;
         std::cout << "Fa (Hartree):\n"
@@ -264,7 +239,6 @@ void processMolecule(const std::string &inputFilename)
         std::cout << "Fb (Hartree):\n"
                   << fBeta_eV << "\n";
 
-        // Check F_alpha symmetry
         if (!fAlpha.is_symmetric(1e-12))
         {
             std::cerr << "Warning: fAlpha matrix is not symmetric!\n";
@@ -274,7 +248,6 @@ void processMolecule(const std::string &inputFilename)
             std::cout << "fAlpha matrix is symmetric.\n";
         }
 
-        // Solve eigenvalue problems
         arma::vec epsilon_alpha;
         arma::mat C_alpha;
         arma::eig_sym(epsilon_alpha, C_alpha, fAlpha);
@@ -298,20 +271,15 @@ void processMolecule(const std::string &inputFilename)
         std::cout << "Pb_new\n"
                   << P_beta_new << "\n";
 
-        // Compute total density matrix
         arma::mat P_total = P_alpha_new + P_beta_new;
 
-        // Print trace of P_total for diagnostics
         arma::vec P_t = arma::sum(P_total, 1);
         std::cout << "P_t\n"
                   << P_t << "\n";
 
-        // Assemble Ga and Gb (Gamma matrices)
-
         arma::mat Ga = fAlpha;
         arma::mat Gb = fBeta;
 
-        // Convert Ga and Gb to eV for printing
         arma::mat Ga_eV = Ga * constants.hartree_to_eV;
         arma::mat Gb_eV = Gb * constants.hartree_to_eV;
         std::cout << "Ga (Hartree):\n"
@@ -319,13 +287,11 @@ void processMolecule(const std::string &inputFilename)
         std::cout << "Gb (Hartree):\n"
                   << Gb_eV << "\n";
 
-        // Calculate maximum change in density matrices
         double delta_alpha = arma::max(arma::abs(P_alpha_new - P_alpha)).max();
         double delta_beta = arma::max(arma::abs(P_beta_new - P_beta)).max();
 
         std::cout << "Delta Alpha: " << delta_alpha << ", Delta Beta: " << delta_beta << "\n";
 
-        // Check convergence
         if (delta_alpha < tolerance && delta_beta < tolerance)
         {
             converged = true;
@@ -333,7 +299,6 @@ void processMolecule(const std::string &inputFilename)
             break;
         }
 
-        // Update density matrices for next iteration
         P_alpha = P_alpha_new;
         P_beta = P_beta_new;
         densityMatrix = DensityMatrix(P_alpha, P_beta, p, q);
@@ -346,17 +311,15 @@ void processMolecule(const std::string &inputFilename)
         std::cerr << "SCF did not converge after " << maxIterations << " iterations.\n";
     }
 
-    // Calculate Total Energy
-    // Electron Energy = 0.5 * sum_mu nu P_total(mu, nu) * (H_core(mu, nu) + F_alpha(mu, nu) + F_beta(mu, nu))
-    // Total Energy = Electron Energy + Nuclear Repulsion Energy
-
     arma::mat P_total_final = P_alpha + P_beta;
     double electronEnergy = 0.5 * arma::accu(P_total_final % (H_core + fAlpha + fBeta));
-    double electronEnergy_eV = electronEnergy * constants.hartree_to_eV; // Convert to eV
+    double electronEnergy_eV = electronEnergy * constants.hartree_to_eV;
     double totalEnergy = electronEnergy_eV + nuclearRepulsionEnergy;
 
     std::cout << "Electron Energy is " << electronEnergy_eV << " eV.\n";
     std::cout << "Total Energy ECNDO/2 = " << totalEnergy << " eV.\n";
+
+    std::cout << "Nuclear Repulsion Energy is " << nuclearRepulsionEnergy << " eV.\n";
 
     std::string outputDirectory = "calculated_outputs";
     if (!fs::exists(outputDirectory))
@@ -378,6 +341,7 @@ void processMolecule(const std::string &inputFilename)
                    << P_total_final << "\n";
         outputFile << "Electron Energy: " << electronEnergy_eV << " eV\n";
         outputFile << "Total Energy ECNDO/2: " << totalEnergy << " eV\n";
+        outputFile << "Nuclear Repulsion Energy: " << nuclearRepulsionEnergy << " eV\n";
         outputFile.close();
         std::cout << "Results written to " << outputFilename << "\n";
     }

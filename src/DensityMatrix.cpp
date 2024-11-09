@@ -12,7 +12,7 @@ DensityMatrix::DensityMatrix(const arma::mat &alphaCoeffs, const arma::mat &beta
 
     if (p_ <= alphaCoeffs_.n_cols)
     {
-        // Occupy the first 'p' columns
+
         arma::mat C_alpha_p = alphaCoeffs_.cols(0, p_ - 1);
         P_alpha_ = C_alpha_p * C_alpha_p.t();
     }

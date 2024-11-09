@@ -5893,6 +5893,7 @@ CMakeFiles/CNDO2.dir/src/FockMatrix.cpp.o: /Users/nematsfolder/chem279/homework4
   /Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include/stdint.h \
   /Users/nematsfolder/chem279/homework4/include/CartesianGaussian.h \
+  /Users/nematsfolder/chem279/homework4/include/Constants.h \
   /Users/nematsfolder/chem279/homework4/include/DensityMatrix.h \
   /Users/nematsfolder/chem279/homework4/include/FockMatrix.h \
   /Users/nematsfolder/chem279/homework4/include/GammaCalculator.h \
@@ -7344,6 +7345,7 @@ CMakeFiles/CNDO2.dir/src/GammaCalculator.cpp.o: /Users/nematsfolder/chem279/home
   /Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include/stdint.h \
+  /Users/nematsfolder/chem279/homework4/include/Constants.h \
   /Users/nematsfolder/chem279/homework4/include/GammaCalculator.h \
   /opt/homebrew/include/armadillo \
   /opt/homebrew/include/armadillo_bits/BaseCube_bones.hpp \

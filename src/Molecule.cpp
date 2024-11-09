@@ -21,7 +21,6 @@ void Molecule::computeBasisFunctions()
             coefficients = {0.15432897, 0.53532814, 0.44463454};
             numElectrons += 1;
 
-            // Create s-orbital CartesianGaussian for the atom
             CartesianGaussian s_orbital(center, exponents, angularMomentumS, coefficients);
             basisFunctions.push_back(s_orbital);
         }
@@ -29,13 +28,11 @@ void Molecule::computeBasisFunctions()
         {
             exponents = {71.6168370, 13.0450963, 3.5305122};
             coefficients = {0.15432897, 0.53532814, 0.44463454};
-            numElectrons += 4; // Adjust based on element
+            numElectrons += 4;
 
-            // Add s-orbital
             CartesianGaussian s_orbital(center, exponents, angularMomentumS, coefficients);
             basisFunctions.push_back(s_orbital);
 
-            // Add p-orbitals
             std::vector<arma::ivec> angularMomentumP = {arma::ivec{1, 0, 0}, arma::ivec{0, 1, 0}, arma::ivec{0, 0, 1}};
             for (const auto &angMom : angularMomentumP)
             {
@@ -43,7 +40,6 @@ void Molecule::computeBasisFunctions()
                 basisFunctions.push_back(p_orbital);
             }
         }
-        // Add more elements as needed
     }
 
     numBasisFunctions = basisFunctions.size();
@@ -64,7 +60,6 @@ int Molecule::getNumBasisFunctions() const
     return numBasisFunctions;
 }
 
-// Implement the addAtom method
 void Molecule::addAtom(const Atom &atom)
 {
     atoms.emplace_back(atom);

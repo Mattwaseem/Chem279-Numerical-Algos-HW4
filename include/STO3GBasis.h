@@ -12,4 +12,4 @@ public:
     void addBasisFunction(double exponent, double coefficient);
 };
 
-#endif // STO3GBASIS_H
+#endif

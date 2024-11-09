@@ -1,25 +1,26 @@
-// FockMatrix.h
 #ifndef FOCKMATRIX_H
 #define FOCKMATRIX_H
 
+#include <armadillo>
+#include <vector>
+#include <unordered_map>
 #include "DensityMatrix.h"
 #include "OverlapMatrix.h"
 #include "GammaCalculator.h"
+#include "Constants.h"
 #include "CartesianGaussian.h"
-#include <armadillo>
-#include <vector>
 
 class FockMatrix
 {
 public:
-    // Updated constructor to include basisFunctions
     FockMatrix(const DensityMatrix &densityMatrix,
                const OverlapMatrix &overlapMatrix,
                const arma::mat &H_core,
                const std::vector<int> &atomicNumbersPerBasisFunction,
                const std::vector<double> &alphas,
                const std::vector<double> &d_total,
-               const std::vector<CartesianGaussian> &basisFunctions); // 7th argument
+               const std::vector<CartesianGaussian> &basisFunctions,
+               const Constants &constants);
 
     arma::mat computeFAlpha();
     arma::mat computeFBeta();
@@ -33,6 +34,12 @@ private:
     std::vector<double> d_total_;
     std::vector<CartesianGaussian> basisFunctions_;
     GammaCalculator gammaCalculator_;
+    std::unordered_map<size_t, double> I_mu_map_;
+    std::unordered_map<size_t, double> A_mu_map_;
+    std::unordered_map<size_t, double> beta_A_map_;
+    Constants constants_;
+
+    void initializeParameters();
 };
 
-#endif // FOCKMATRIX_H
+#endif

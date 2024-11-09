@@ -7,9 +7,9 @@
 
 struct AtomicParams
 {
-    double I_s;  // Ionization energy (s-orbital)
-    double I_p;  // Ionization
-    double beta; // Bonding
+    double I_s;
+    double I_p;
+    double beta;
 };
 
 class Constants
@@ -17,6 +17,7 @@ class Constants
 public:
     Constants();
     const double hartree_to_eV = 27.211;
+    const double angstrom_to_bohr = 1.88973;
 
     double getIonizationPotential(int atomicNumber) const;
     double getElectronAffinity(int atomicNumber) const;

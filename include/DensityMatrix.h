@@ -6,7 +6,6 @@
 class DensityMatrix
 {
 public:
-    // Constructor
     DensityMatrix(const arma::mat &alphaCoeffs, const arma::mat &betaCoeffs, int p, int q);
 
     // Getter functions
@@ -18,7 +17,6 @@ public:
     void setP_alpha(const arma::mat &P_alpha);
     void setP_beta(const arma::mat &P_beta);
 
-    // Other member functions as required
     arma::mat computeAlphaDensityMatrix() const;
     arma::mat computeBetaDensityMatrix() const;
     arma::mat computeTotalDensityMatrix() const;
@@ -31,7 +29,7 @@ private:
 
     arma::mat P_alpha_; // Alpha density matrix
     arma::mat P_beta_;  // Beta density matrix
-    arma::mat P_total_; // Total density matrix
+    arma::mat P_total_;
 };
 
-#endif // DENSITYMATRIX_H
+#endif

@@ -22,4 +22,4 @@ private:
     arma::mat overlapMatrix_;
 };
 
-#endif // OVERLAPMATRIX_H
+#endif
